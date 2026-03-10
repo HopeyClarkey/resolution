@@ -27,7 +27,7 @@ const MoodGame = () => {
       onFocus={() => handleSevenSecondMouseChange(true)}
       onDrop={() => handleEightSecondMouseChange(true)}
     >
-      {' '}
+
       This is where mood game will eventually go!
     </div>
   );
