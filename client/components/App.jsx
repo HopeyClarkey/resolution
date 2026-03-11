@@ -25,6 +25,11 @@ import { setAuthUser, setIsAuthenticated } from "./store/appSlice.js";
 import MoodNotes from "./MoodNotes.jsx";
 import MoodMemos from "./MoodNotesComponents/MoodMemos.jsx";
 
+import MoodGame from "./MoodGame.jsx";
+
+
+
+
 const App = () => {
 
   const dispatch = useDispatch();
@@ -312,6 +317,8 @@ const App = () => {
             path="/MoodMemos"
             element={<MoodMemos/>}
           />
+          <Route path="/MoodGame" element={<MoodGame />} />
+
         </Route>
       </Routes>
     </BrowserRouter>

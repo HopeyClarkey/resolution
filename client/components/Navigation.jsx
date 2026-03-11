@@ -1,8 +1,8 @@
-import { Outlet, NavLink } from "react-router-dom";
+import { Outlet, NavLink } from 'react-router-dom';
 // nav collapse feature for small device widths
-import "bootstrap/js/src/collapse.js";
-import ResolutionLogo from "../img/resolution_app_logo_mini.svg";
-import { useState, useEffect } from "react";
+import 'bootstrap/js/src/collapse.js';
+import ResolutionLogo from '../img/resolution_app_logo_mini.svg';
+import { useState, useEffect } from 'react';
 
 const Navigation = () => {
   // state for navigation collapse
@@ -27,9 +27,9 @@ const Navigation = () => {
         width: window.innerWidth,
       });
     };
-    window.addEventListener("resize", handleResize);
+    window.addEventListener('resize', handleResize);
     // clean up event listener every time useEffect runs
-    return () => window.removeEventListener("resize", handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   });
 
   return (
@@ -40,7 +40,7 @@ const Navigation = () => {
             <img
               src={ResolutionLogo}
               alt="Resolution Logo"
-              style={{ width: "auto", height: "2.5em" }}
+              style={{ width: 'auto', height: '2.5em' }}
             />
           </NavLink>
           <button
@@ -56,7 +56,7 @@ const Navigation = () => {
             <span className="navbar-toggler-icon"></span>
           </button>
           <div
-            className={`navbar-collapse ${collapseNav ? "collapse" : ""}`}
+            className={`navbar-collapse ${collapseNav ? 'collapse' : ''}`}
             id="navbarToggleTarget"
           >
             <ul className="navbar-nav mr-auto mt-1 mt-lg-0">
@@ -114,11 +114,21 @@ const Navigation = () => {
                 <NavLink
                   className="nav-link"
                   href="#"
+                  to="/MoodGame"
+                  onClick={handleCollapseNav}
+                >
+                  MoodGame
+                </NavLink>
+              </li>
+              <li className="nav-item" role="navigation">
+                <NavLink
+                  className="nav-link"
+                  href="#"
                   to="/Controversy"
                   onClick={handleCollapseNav}
                 >
                   Controversy
-                </NavLink> 
+                </NavLink>
               </li>
               <li className="nav-item" role="navigation">
                 <NavLink
@@ -127,8 +137,8 @@ const Navigation = () => {
                   to="/Overview"
                   onClick={handleCollapseNav}
                 >
-                  Overview 
-                </NavLink> 
+                  Overview
+                </NavLink>
               </li>
               <li className="nav-item" role="navigation">
                 <NavLink
@@ -138,7 +148,7 @@ const Navigation = () => {
                   onClick={handleCollapseNav}
                 >
                   My Profile
-                </NavLink> 
+                </NavLink>
               </li>
               <li className="nav-item" role="navigation">
                 <NavLink

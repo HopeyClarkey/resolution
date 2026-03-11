@@ -1,7 +1,7 @@
 {
   "name": "resolution",
-  "version": "1.0.0",
-  "description": "greenfield project",
+  "version": "3.0.0",
+  "description": "Legacy Project",
   "main": "index.js",
   "scripts": {
     "seed": "node ./server/database/seed.js",
