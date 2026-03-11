@@ -147,7 +147,17 @@ const Navigation = () => {
                   to="/UserProfile"
                   onClick={handleCollapseNav}
                 >
-                  My Profile
+                   My Profile
+                </NavLink>
+              </li>
+              <li className="nav-item" role="navigation">
+                <NavLink
+                  className="nav-link"
+                  href="#"
+                  to="/SeeJudge"
+                  onClick={handleCollapseNav}
+                >
+                  See Judge
                 </NavLink>
               </li>
               <li className="nav-item" role="navigation">

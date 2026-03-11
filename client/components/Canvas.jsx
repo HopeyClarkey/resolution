@@ -1,13 +1,12 @@
-import { useRef, useEffect } from "react";
+import { useRef, useEffect } from 'react';
 import Pinata from '../img/pinata.png';
-const Canvas = ({userPhoto}) => {
-  const canvas = useRef(); 
+const Canvas = ({ userPhoto }) => {
+  const canvas = useRef();
   const rotate = Math.PI / 180;
   const maxRotate = 25 * rotate;
   const FREQUENCY = 0.3; //swings per second
 
-  const draw = (ctx) => {     
-
+  const draw = (ctx) => {
     const gradient = ctx.createLinearGradient(10, 0, 500, 0);
     gradient.addColorStop(0, 'red');
     gradient.addColorStop(1 / 6, 'orange');
@@ -17,13 +16,13 @@ const Canvas = ({userPhoto}) => {
     gradient.addColorStop(5 / 6, 'indigo');
     gradient.addColorStop(1, 'violet');
     ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);      
+    ctx.fillRect(0, 0, canvas.current.width, canvas.current.height);
   };
 
   const sinT = (time) => {
     return Math.sin(FREQUENCY * time * Math.PI * 0.002); // 0.002 allow time in ms
   };
-  
+
   const drawPinata = (ctx, x, y, photo) => {
     let time;
     if (!time) {
@@ -33,7 +32,12 @@ const Canvas = ({userPhoto}) => {
     const userImg = new Image();
     pinataImg.onload = () => {
       ctx.setTransform(1, 0, 0, 1, canvas.current.width * 0.5, 0);
-      ctx.clearRect(-canvas.current.width * 0.5, 0, canvas.current.width, canvas.current.height);
+      ctx.clearRect(
+        -canvas.current.width * 0.5,
+        0,
+        canvas.current.width,
+        canvas.current.height,
+      );
       ctx.rotate(sinT(time) * maxRotate);
       //draw(ctx);
       ctx.save();
@@ -49,25 +53,23 @@ const Canvas = ({userPhoto}) => {
         ctx.closePath();
         ctx.restore();
       };
-      
+
       requestAnimationFrame(() => drawPinata(ctx, x, y, photo));
     };
     pinataImg.src = Pinata;
     userImg.src = photo;
-  };  
+  };
 
-  
   useEffect(() => {
-    const ctx = canvas.current.getContext('2d'); 
+    const ctx = canvas.current.getContext('2d');
     drawPinata(ctx, -100, 100, userPhoto);
   }, [userPhoto]);
-
 
   return (
     <canvas
       ref={canvas} // ADDED
-      width='500'
-      height='400'
+      width="500"
+      height="400"
     />
   );
 };
