@@ -1,15 +1,10 @@
 require('dotenv').config();
-require('./auth/passport');
 const express = require('express');
 const session = require('express-session');
 const path = require('path');
-const passport = require('passport');
 const authRoutes = require('./routes/auth');
 const users = require('./routes/users');
 
-require('dotenv').config();
-
-// passport strategy
 const messageRouter = require('./routes/messagesHandling');
 const wofRouter = require('./routes/wofRoutes.js');
 const rewardsRouter = require('./routes/rewardsRouter.js');
@@ -29,8 +24,13 @@ console.log(distPath);
 
 //generate secret key
 const app = express();
-const uuid = require('uuid');
-const secretKey = uuid.v4();
+const secretKey = process.env.SESSION_SECRET || 'fallback-secret-for-dev-only';
+const { Users, db: sequelize } = require('./database/index');
+
+// Check database connection
+sequelize.authenticate()
+  .then(() => console.log('Database connected successfully.'))
+  .catch(err => console.error('Unable to connect to the database:', err));
 
 // test server setup for sockets
 const http = require('http');
@@ -49,8 +49,18 @@ app.use(
     saveUninitialized: false
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
+
+app.use(async (req, res, next) => {
+  if (req.session && req.session.userId) {
+    try {
+      const user = await Users.findByPk(req.session.userId);
+      req.user = user;
+    } catch (err) {
+      console.error('Error hydrating user from session:', err);
+    }
+  }
+  next();
+});
 
 // routes
 app.use('/news', newsRouter);
@@ -65,10 +75,6 @@ app.use('/mood', MoodRouter);
 // serve the uploads folder as a static directory
 app.use('/uploads', express.static('server/public/uploads'));
 
-// app.get('/favicon.ico', (req, res) => {
-//   res.status(204).end(); // respond with a 204 No Content status code
-// });
-
 app.use('/', homeRouter);
 
 // fill out routes
@@ -77,7 +83,6 @@ app.use('/decisionmaker', dmakerRouter);
 // decision maker sockets
 
 io.sockets.on('connection', (socket) => {
-  console.log(`a user connected ${socket.id}`);
 
   socket.on('join_room', (data) => {
     const clients = io.sockets.adapter.rooms.get(data);

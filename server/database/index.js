@@ -11,7 +11,6 @@ const sequelize = new Sequelize({
   logging: false,
 });
 
-// Declare our schema. This is the shape of our data
 const Users = sequelize.define(
   'Users',
   {

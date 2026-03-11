@@ -1,11 +1,19 @@
-import GoogleButton from 'react-google-button';
+import { GoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
 import ResolutionLogo from '../img/resolution_app_logo_mini.svg';
 
 const SignUp = () => {
-
-  // redirect user to sign up page
-  const redirectToGoogleSSO = () => {
-    window.location.href = `${process.env.HOST}/auth/login/google`;
+  const handleSuccess = async (credentialResponse) => {
+    const { credential } = credentialResponse;
+    
+    try {
+      const response = await axios.post('/auth/google-login', { token: credential });
+      if (response.status === 200) {
+        window.location.href = '/Home';
+      }
+    } catch (err) {
+      console.error('Login failed', err);
+    }
   };
 
   return (
@@ -23,7 +31,10 @@ const SignUp = () => {
               />
             </div>
             <div className="d-flex justify-content-center mb-3">
-              <GoogleButton onClick={redirectToGoogleSSO} />
+              <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={() => console.log('Login Failed')}
+              />
             </div>
             <p className="text-center">Welcome</p>
           </div>

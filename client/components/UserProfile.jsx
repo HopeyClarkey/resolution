@@ -91,11 +91,16 @@ const UserProfile = ({trophy, points}) => {
     }
   };
 
-  const handleLogout = () => {
-    // logout the user by clearing the authUser state
-    dispatch(setAuthUser(null));
-    // redirect the user to the homepage
-    window.location.href = process.env.HOST;
+  const handleLogout = async () => {
+    try {
+      await axios.post('/auth/logout');
+      // logout the user by clearing the authUser state
+      dispatch(setAuthUser(null));
+      // redirect the user to the homepage
+      window.location.href = process.env.HOST;
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
 
   // if there's no user return loading
