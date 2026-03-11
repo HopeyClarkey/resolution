@@ -8,6 +8,14 @@ const MoodGame = () => {
   const [sevenSecondBubbleChange, setSevenSecondBubbleChange] = useState(false);
   const [eightSecondBubbleChange, setEightSecondBubbleChange] = useState(false);
 
+  const instructions = `Start the game and a bubble will appear.
+      The game begins when you hold down the bubble.
+      Drag the bubble to the box while you inhale for a full 4 seconds.
+      Tap the bubble to hold your breath and hold for another 7 seconds.
+      As you exhale, drag the bubble to the box and let go on 8 seconds.
+      The bubble will pop and your score will go up for each successful cycle.
+      When you complete 5 cycles, you are calm. Have sparkles.`;
+
   const Draggable = () => {
     const { ref } = useDraggable({
       id: 'draggable',
@@ -34,14 +42,17 @@ const MoodGame = () => {
 
     useEffect(() => {
       let timeout;
+
       if (currentIndex <= text.length) {
         timeout = setTimeout(() => {
           setCurrentText((prevText) => prevText + text[currentIndex]);
-          setCurrentText((prevIndex) => prevIndex + 1);
+          setCurrentIndex((prevIndex) => prevIndex + 1);
         }, delay);
       } else if (infinite) {
-        setCurrentIndex(0), setCurrentText('');
+        setCurrentIndex(0);
+        setCurrentText('');
       }
+
       return () => clearTimeout(timeout);
     }, [currentIndex, delay, infinite, text]);
 
@@ -95,13 +106,7 @@ const MoodGame = () => {
       </h1>
       <GameBox />
       <Typewriter
-        text={`Start the game and a bubble will appear.
-      The game begins when you hold down the bubble.
-      Drag the bubble to the box while you inhale for a full 4 seconds.
-      Tap the bubble to hold your breath and hold for another 7 seconds.
-      As you exhale, drag the bubble to the box and let go on 8 seconds.
-      The bubble will pop and your score will go up for each successful cycle.
-      When you complete 5 cycles, you are calm. Have sparkles.`}
+        text={instructions}
         delay={100}
       />
       <button> Start the Game </button>
