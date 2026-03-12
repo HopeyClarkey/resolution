@@ -46,7 +46,7 @@ const MoodGame = () => {
   const Draggable = () => {
     const { ref } = useDraggable({
       id: 'draggable',
-      modifiers: [RestrictToElement, RestrictToVerticalAxis]
+      modifiers: [RestrictToElement, RestrictToVerticalAxis],
     });
     return (
       <button
@@ -62,7 +62,11 @@ const MoodGame = () => {
     });
 
     return (
-      <div className= "DropBox"ref={ref} style={{ width: '25vh', height: '10vh' }}>
+      <div
+        className="drop-box"
+        ref={ref}
+        style={{ width: '10vh', height: '10vh' }}
+      >
         {children}
       </div>
     );
@@ -74,28 +78,35 @@ const MoodGame = () => {
     const draggable = <Draggable id="draggable">Drag me</Draggable>;
 
     return (
-      <DragDropProvider className="DDP"
-        onDragEnd={(event) => {
-          if (event.canceled) {
-            return;
-          }
+      <div className="drop-container">
+        <div className="dropkit-container">
+          <DragDropProvider
+            onDragEnd={(event) => {
+              if (event.canceled) {
+                return;
+              }
 
-          setTarget(event.operation.target?.id);
-        }}
-      >
-        {!target ? draggable : null}
+              setTarget(event.operation.target?.id);
+            }}
+          >
+            {!target ? draggable : null}
 
-        {targets.map((id) => (
-          <Droppable key={id} id={id}>
-            {target === id ? draggable : `Droppable ${id}`}
-          </Droppable>
-        ))}
-      </DragDropProvider>
+            {targets.map((id) => (
+              <Droppable key={id} id={id}>
+                {target === id ? draggable : `Droppable ${id}`}
+              </Droppable>
+            ))}
+          </DragDropProvider>
+        </div>
+      </div>
     );
   };
 
   return (
-    <div className="wof-component container" style={{ alignContent: 'center' }}>
+    <div
+      className="wof-component container"
+      style={{ alignContent: 'center', padding: 25 }}
+    >
       <h1 className="text-primary">
         Angry? Calm down with 4-7-8 breathing bubbles!!
       </h1>
@@ -115,8 +126,6 @@ const MoodGame = () => {
   );
 };
 export default MoodGame;
-
-
 
 // const handleInitialBubbleClick = (e) => {
 //   setInitialBubbleClick(true);
