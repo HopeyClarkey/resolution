@@ -83,11 +83,19 @@ const MoodGame = () => {
     return (
       <div className="drop-container">
         <div className="drop" style={{ position: 'relative' }}>
-          {gameStarted && <Draggable position={position} />}
-          <Droppable id="inhale">Inhale</Droppable>
-          <Droppable id="hold">Hold</Droppable>
-          <Droppable id="exhale">Exhale</Droppable>
-          <Droppable id="pop">Pop</Droppable>
+          <div className="drop-inhale" style={{ position: 'relative' }}>
+            {gameStarted && <Draggable position={position} />}
+            <Droppable id="inhale">Inhale</Droppable>
+          </div>
+          <div className="drop-hold" style={{ position: 'relative' }}>
+            <Droppable id="hold">Hold</Droppable>
+          </div>
+          <div className="drop-exhale" style={{ position: 'relative' }}>
+            <Droppable id="exhale">Exhale</Droppable>
+          </div>
+          <div className="drop-pop " style={{ position: 'relative' }}>
+            <Droppable id="pop">Pop</Droppable>
+          </div>
         </div>
       </div>
     );
@@ -120,7 +128,7 @@ const MoodGame = () => {
       Tap the bubble to hold your breath and hold for another 7 seconds.
       As you exhale, drag the bubble to the box and let go on 8 seconds.
       The bubble will pop and your score will go up for each successful cycle.
-      When you complete 5 cycles, you are calm. Have sparkles.`}
+      When you complete 5 cycles, you are calm. Have sparkles. defonm`}
         delay={100}
       />
       <button onClick={() => setGameStarted(true)}>Start the Game</button>

@@ -349,34 +349,54 @@ textarea {
 }
 
 .droppable {
-  width: 25%;
-  height: 25%;
+  height: 100%;
+  width: 100%;
   border: 1px dashed gray;
 }
 
 .droppable-active {
-  width: 25%;
-  height: 25%;
+  height: 100%;
+  width: 100%;
   border: 1px dashed gray;
   background-color: #888;
 }
 
 .drop-container {
   background-color: #153252;
-  height: 60vh;
+  height: 100%;
   width: 100%;
   display: flex;
-  justify-content: center;
+  justify-content: Space around;
 
 }
 .drop-inhale {
+    display: flex;
+  flex-direction: column;
+  align-items: space-around;
+  height: 100%;
+  width: 100%;
 }
 .drop-hold {
+    display: flex;
+  flex-direction: column;
+  align-items: space-around;
+  height: 100%;
+  width: 100%;
 }
 .drop-exhale {
+    display: flex;
+  flex-direction: column;
+  align-items: space-around;
+  height: 100%;
+  width: 100%;
 }
 
 .drop-pop {
+    display: flex;
+  flex-direction: column;
+  align-items: space-around;
+  height: 100%;
+  width: 100%;
 }
 
 .inhale {
