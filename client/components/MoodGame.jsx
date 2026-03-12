@@ -51,7 +51,7 @@ const MoodGame = () => {
     return (
       <button
         ref={ref}
-        style={{ width: 35, height: 35, borderRadius: '50%' }}
+        style={{ width: '10vh', height: '10vh', borderRadius: '50%' }}
       ></button>
     );
   };
@@ -62,7 +62,7 @@ const MoodGame = () => {
     });
 
     return (
-      <div ref={ref} style={{ width: '25vh', height: '10vh' }}>
+      <div className= "DropBox"ref={ref} style={{ width: '25vh', height: '10vh' }}>
         {children}
       </div>
     );
@@ -74,7 +74,7 @@ const MoodGame = () => {
     const draggable = <Draggable id="draggable">Drag me</Draggable>;
 
     return (
-      <DragDropProvider
+      <DragDropProvider className="DDP"
         onDragEnd={(event) => {
           if (event.canceled) {
             return;
@@ -115,6 +115,8 @@ const MoodGame = () => {
   );
 };
 export default MoodGame;
+
+
 
 // const handleInitialBubbleClick = (e) => {
 //   setInitialBubbleClick(true);
