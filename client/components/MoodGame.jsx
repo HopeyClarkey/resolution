@@ -5,6 +5,8 @@ import {
   DragOverlay,
   DragDropProvider,
 } from '@dnd-kit/react';
+import { RestrictToElement, RestrictToWindow } from '@dnd-kit/dom/modifiers';
+import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers';
 
 const MoodGame = () => {
   const [initalBubbleClick, setInitialBubbleClick] = useState(false);
@@ -44,6 +46,7 @@ const MoodGame = () => {
   const Draggable = () => {
     const { ref } = useDraggable({
       id: 'draggable',
+      modifiers: [RestrictToElement, RestrictToVerticalAxis]
     });
     return (
       <button
