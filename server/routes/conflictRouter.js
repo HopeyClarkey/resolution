@@ -40,7 +40,7 @@ conflictRouter.post('/judge', async (req, res) => {
     
     res.status(200).send(JSON.parse(text));
   } catch (err) {
-    console.error('Gemini Judge Error:', err);
+    console.error('Judge Error:', err);
     res.status(500).send({ error: "The judge encountered a legal loophole. Please try again later." });
   }
 });
