@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
+  useDragDropMonitor,
   useDraggable,
   useDroppable,
   DragOverlay,
@@ -7,6 +8,8 @@ import {
 } from '@dnd-kit/react';
 import { RestrictToElement, RestrictToWindow } from '@dnd-kit/dom/modifiers';
 import { RestrictToVerticalAxis } from '@dnd-kit/abstract/modifiers';
+import { PointerSensor, KeyboardSensor } from '@dnd-kit/dom';
+import { tsParticles } from "@tsparticles/engine";
 
 const MoodGame = () => {
   const [initalBubbleClick, setInitialBubbleClick] = useState(false);
@@ -43,6 +46,10 @@ const MoodGame = () => {
     }, [currentIndex, delay, infinite, text]);
     return <span>{currentText}</span>;
   };
+
+
+
+  
   const Draggable = () => {
     const { ref } = useDraggable({
       id: 'draggable',
@@ -73,14 +80,20 @@ const MoodGame = () => {
   };
 
   const GameBox = () => {
-    const targets = ['4 seconds', '7 seconds', '8 seconds', 'pop'];
+    const inhale = { text: 'inhale', id: 'inhale', className: 'inhale' };
+    const hold = { text: 'hold', id: 'hold', className: 'hold' };
+    const exhale = { text: 'exhale', id: 'exhale', className: 'exhale' };
+    const pop = { text: 'pop', id: 'pop', className: 'pop' };
+
+    const targets = [inhale, exhale, hold, pop];
     const [target, setTarget] = useState();
     const draggable = <Draggable id="draggable">Drag me</Draggable>;
 
     return (
       <div className="drop-container">
-        <div className="dropkit-container">
+        <div className="drop">
           <DragDropProvider
+            sensors={[PointerSensor, KeyboardSensor]}
             onDragEnd={(event) => {
               if (event.canceled) {
                 return;
@@ -91,9 +104,9 @@ const MoodGame = () => {
           >
             {!target ? draggable : null}
 
-            {targets.map((id) => (
-              <Droppable key={id} id={id}>
-                {target === id ? draggable : `Droppable ${id}`}
+            {targets.map((box) => (
+              <Droppable key={box.id} id={box.id} className={box.className}>
+                {target === box.id ? draggable : `Droppable ${box.id}`}
               </Droppable>
             ))}
           </DragDropProvider>
@@ -122,6 +135,7 @@ const MoodGame = () => {
         delay={100}
       />
       <button> Start the Game </button>
+      <div id="tsparticles"></div>
     </div>
   );
 };

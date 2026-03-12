@@ -1,9 +1,8 @@
 /* //// Root Variables */
 :root {
   --color-primary: #0d6efd;
-  --color-white: #ffffff
+  --color-white: #ffffff;
 }
-
 
 /* //// GLOBAL STYLES */
 
@@ -24,7 +23,7 @@ hr {
 textarea {
   box-shadow: 4px 4px 0px var(--color-primary);
   min-height: 2em;
-  margin-bottom: .5em;
+  margin-bottom: 0.5em;
   padding: 10px;
 }
 
@@ -47,7 +46,7 @@ textarea {
 
 .nav-link:active,
 .nav-link:hover {
-  color: var(--color-primary)
+  color: var(--color-primary);
 }
 
 /* //// HOME COMPONENT */
@@ -124,18 +123,18 @@ textarea {
   position: sticky;
   width: 500px;
   height: 400px;
-  flex-direction:inherit;
+  flex-direction: inherit;
 
   background: white;
 }
 
-
-
-
-
 /* Sign Up Component */
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
   40% {
@@ -154,9 +153,9 @@ textarea {
 
 @media screen and (max-width: 540px) {
   .wof-header-container {
-      flex-direction: column;
-      align-items: center;
-    }
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 /* //// CONTROVERSY COMPONENT */
@@ -193,15 +192,14 @@ textarea {
   resize: none;
   margin-top: 10px;
 }
-.link-muted { 
-  color: #aaa; 
-} 
-.link-muted:hover { 
-  color: #1266f1; 
+.link-muted {
+  color: #aaa;
+}
+.link-muted:hover {
+  color: #1266f1;
 }
 
-
-/* ////Notification component */ 
+/* ////Notification component */
 .notify-container {
   position: fixed;
   bottom: 0;
@@ -212,10 +210,8 @@ textarea {
   padding: 10px;
   box-shadow: 0 0 10px rgba(23, 5, 214, 0.2);
   z-index: 9999;
-  
+
   /* display: block; */
-
-
 }
 
 .notify-popup {
@@ -226,7 +222,9 @@ textarea {
   margin-bottom: 10px;
   border-radius: 4px;
   max-width: 300px;
-  animation: slideIn 0.5s ease-in-out, fadeOut 0.5s 2s ease-in-out;
+  animation:
+    slideIn 0.5s ease-in-out,
+    fadeOut 0.5s 2s ease-in-out;
   background-color: red;
 }
 
@@ -236,9 +234,10 @@ textarea {
   border: none;
   padding: 5px 10px;
   cursor: pointer;
-  border-radius: 4px;}
+  border-radius: 4px;
+}
 
-  /* Animation Keyframes */
+/* Animation Keyframes */
 @keyframes slideIn {
   from {
     transform: translateX(100%);
@@ -339,4 +338,20 @@ textarea {
 .timestamp {
   font-size: 12px;
   color: #888;
+}
+
+.drop-container {
+    background-color: #153252;
+    height: 100vw;
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+    overflow: hidden;
+}
+.drop {
+    background-color: #007bff;
+}
+
+.inhale{
+      background-color: #154475;
 }
