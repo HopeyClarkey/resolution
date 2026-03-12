@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useDraggable, useDroppable } from '@dnd-kit/react';
-import { DragDropProvider } from '@dnd-kit/react';
+import {
+  useDraggable,
+  useDroppable,
+  DragOverlay,
+  DragDropProvider,
+} from '@dnd-kit/react';
 
 const MoodGame = () => {
   const [initalBubbleClick, setInitialBubbleClick] = useState(false);
@@ -8,13 +12,15 @@ const MoodGame = () => {
   const [sevenSecondBubbleChange, setSevenSecondBubbleChange] = useState(false);
   const [eightSecondBubbleChange, setEightSecondBubbleChange] = useState(false);
 
-  const instructions = `Start the game and a bubble will appear.
+  const instructions = {
+    text: `Start the game and a bubble will appear.
       The game begins when you hold down the bubble.
       Drag the bubble to the box while you inhale for a full 4 seconds.
       Tap the bubble to hold your breath and hold for another 7 seconds.
       As you exhale, drag the bubble to the box and let go on 8 seconds.
       The bubble will pop and your score will go up for each successful cycle.
-      When you complete 5 cycles, you are calm. Have sparkles.`;
+      When you complete 5 cycles, you are calm. Have sparkles.`,
+  };
 
   const Typewriter = ({ text, delay, infinite }) => {
     const [currentText, setCurrentText] = useState('');
@@ -39,7 +45,12 @@ const MoodGame = () => {
     const { ref } = useDraggable({
       id: 'draggable',
     });
-    return <button ref={ref}>Draggable</button>;
+    return (
+      <button
+        ref={ref}
+        style={{ width: 35, height: 35, borderRadius: '50%' }}
+      ></button>
+    );
   };
 
   const Droppable = ({ id, children }) => {
@@ -48,14 +59,14 @@ const MoodGame = () => {
     });
 
     return (
-      <div ref={ref} style={{ width: 300, height: 300 }}>
+      <div ref={ref} style={{ width: '25vh', height: '10vh' }}>
         {children}
       </div>
     );
   };
 
   const GameBox = () => {
-    const targets = ['A', 'B', 'C'];
+    const targets = ['4 seconds', '7 seconds', '8 seconds', 'pop'];
     const [target, setTarget] = useState();
     const draggable = <Draggable id="draggable">Drag me</Draggable>;
 
@@ -86,7 +97,16 @@ const MoodGame = () => {
         Angry? Calm down with 4-7-8 breathing bubbles!!
       </h1>
       <GameBox />
-      <Typewriter text={instructions} delay={100} />
+      <Typewriter
+        text={`Start the game and a bubble will appear.
+      The game begins when you hold down the bubble.
+      Drag the bubble to the box while you inhale for a full 4 seconds.
+      Tap the bubble to hold your breath and hold for another 7 seconds.
+      As you exhale, drag the bubble to the box and let go on 8 seconds.
+      The bubble will pop and your score will go up for each successful cycle.
+      When you complete 5 cycles, you are calm. Have sparkles.`}
+        delay={100}
+      />
       <button> Start the Game </button>
     </div>
   );
