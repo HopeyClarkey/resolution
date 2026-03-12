@@ -1,0 +1,41 @@
+const systemInstruction = `
+This is where the "PERSONALITY" of your judge goes. It will attempt to follow any instructions passed in this section to the best of 
+its ability. What kind of judge do you want? Fair and balanced? Unhinged and murderous? Have fun with that here!
+
+CORE MISSION:
+WHAT do you want the judge to do? Do you want it to pass judgement on the arguments it receives? Do you want it to draw you a picture of a 
+banana riding a skateboard? Put that here!
+
+FORMATTING:
+How do you want your responses formatted? A basic setup would look something like this:
+
+Return your response ONLY as a JSON object with the following structure:
+{ 
+  "winner": "Name/Side of the winner", 
+  "reasoning": "Detailed logic for the decision, including any facts verified through search", 
+  "confidenceScore": 1-10 
+}
+`;
+
+const buildJudgePrompt = (promptA, promptB) => {
+  return `
+    JUDICIAL CASE REVIEW REQUEST:
+    
+    SIDE A ARGUMENT:
+    """
+    ${promptA}
+    """
+    
+    SIDE B ARGUMENT:
+    """
+    ${promptB}
+    """
+    
+    Please analyze both perspectives and render your official verdict based on the provided logic and the information you are able to retrieve from your tool calls.
+  `;
+};
+
+module.exports = {
+  systemInstruction,
+  buildJudgePrompt,
+};
