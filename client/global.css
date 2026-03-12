@@ -340,18 +340,44 @@ textarea {
   color: #888;
 }
 
-.drop-container {
-    background-color: #153252;
-    height: 100vw;
-    width: 100%;
-    display: flex;
-    justify-content: space-evenly;
-    overflow: hidden;
-}
 .drop {
-    background-color: #007bff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 60vh;
+  width: 100%;
 }
 
-.inhale{
-      background-color: #154475;
+.droppable {
+  width: 25%;
+  height: 25%;
+  border: 1px dashed gray;
+}
+
+.droppable-active {
+  width: 25%;
+  height: 25%;
+  border: 1px dashed gray;
+  background-color: #888;
+}
+
+.drop-container {
+  background-color: #153252;
+  height: 60vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+
+}
+.drop-inhale {
+}
+.drop-hold {
+}
+.drop-exhale {
+}
+
+.drop-pop {
+}
+
+.inhale {
 }
