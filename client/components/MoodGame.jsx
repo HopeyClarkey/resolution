@@ -19,12 +19,17 @@ const instructions = {
 };
 
 const GameBox = ({ position, gameStarted, bubbleColor }) => {
+  const [cycleKey, setCycleKey] = useState(0);
   return (
     <div className="drop-container">
       <div className="drop" style={{ position: 'relative' }}>
         <div className="drop-inhale" style={{ position: 'relative' }}>
           {gameStarted && (
-            <Draggable position={position} bubbleColor={bubbleColor} />
+            <Draggable
+              position={position}
+              bubbleColor={bubbleColor}
+              key={cycleKey}
+            />
           )}
           <Droppable id="inhale">Inhale</Droppable>
         </div>
@@ -123,35 +128,47 @@ const MoodGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [bubbleColor, setBubbleColor] = useState('#ff5733');
   const [timer, setTimer] = useState(0);
+  const [cycleKey, setCycleKey] = useState(0);
   //timer will need to use 0-4 for inhale, 5-13 for hold, 14-22 exhale, and 23 for pop.
 
   const changeBubbleColor = () => {};
 
-  const timeReference = useRef(0);
-  const intervalRef = useRef(null);
-  const timeBubble = () => {
-    setInterval(() => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-      intervalRef.current = setInterval(() => {
-        timeReference.current += 1;
-        setTimer(timeReference.current);
-      }, 1000);
-    });
-  };
+  // const timeReference = useRef(0);
+  // const intervalRef = useRef(null);
+  // const timeBubble = () => {
+  //   if (intervalRef.current) {
+  //     clearInterval(intervalRef.current);
+  //   }
+  //   timeReference.current = 0;
+  //   intervalRef.current = setInterval(() => {
+  //     timeReference.current += 1;
+  //     setTimer(timeReference.current);
+  //   }, 1000);
+  // };
 
   useEffect(() => {
-    if (timer >= 0 && timer <= 3) {
+    if (timer === null) {
+      return;
+    }
+    console.log('timer:', timer);
+    if (timer <= 3) {
       setBubbleColor('#0d6efd');
-    } else if (timer >= 4 && timer <= 12) {
+    } else if (timer <= 12) {
       setBubbleColor('#a7c3ee');
-    } else if (timer >= 13 && timer <= 22) {
+    } else if (timer <= 22) {
       setBubbleColor('#0d1725');
     } else if (timer >= 23) {
       setBubbleColor('#b6118d');
     }
+    const time = setTimeout(() => {
+      setTimer((t) => t + 1);
+    }, 1000);
+
+    return () => clearTimeout(time);
   }, [timer]);
+
+  const startTimer = () => setTimer(0);
+  const resetTimer = () => setTimer(null);
 
   return (
     <div
@@ -162,21 +179,16 @@ const MoodGame = () => {
         Angry? Calm down with 4-7-8 breathing bubbles!!
       </h1>
       <DndContext
-        modifiers={[restrictToVerticalAxis]}
+        //modifiers={[restrictToVerticalAxis]}
         onDragEnd={({ over, delta }) => {
+          console.log('drag ended, over:', over?.id, 'delta:', delta);
           if (over?.id === 'pop') {
             triggerParticles();
-            setTimer(0);
-            setBubbleColor('#0d6efd');
             setPosition({ x: 0, y: 0 });
+            setCycleKey((k) => k + 1); // ← add this
             setTimeout(() => {
-              timeBubble();
+              setTimer(0);
             }, 3000);
-          } else if (over) {
-            setPosition((prev) => ({
-              x: 0,
-              y: prev.y + delta.y,
-            }));
           }
         }}
       >
@@ -184,13 +196,14 @@ const MoodGame = () => {
           position={position}
           gameStarted={gameStarted}
           bubbleColor={bubbleColor}
+          cycleKey={cycleKey}
         />
       </DndContext>
       <Typewriter text={instructions.text} delay={100} />
       <button
         onClick={() => {
           setGameStarted(true);
-          timeBubble();
+          startTimer();
         }}
       >
         Start the Game
