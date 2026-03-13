@@ -11,7 +11,7 @@ const { NODE_ENV } = process.env;
 
 
 
-const isProduction = NODE_ENV == "production";
+//const isProduction = NODE_ENV == "production";
 
 const stylesHandler = isProduction
   ? MiniCssExtractPlugin.loader

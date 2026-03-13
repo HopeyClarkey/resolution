@@ -48,7 +48,7 @@ const Typewriter = ({ text, delay, infinite }) => {
 
   useEffect(() => {
     let timeout;
-    if (currentIndex <= text.length) {
+    if (currentIndex < text.length) {
       timeout = setTimeout(() => {
         setCurrentText((prevText) => prevText + text[currentIndex]);
         setCurrentIndex((prevIndex) => prevIndex + 1);
@@ -82,6 +82,7 @@ const Draggable = ({ position, bubbleColor }) => {
     <button ref={setNodeRef} {...listeners} {...attributes} style={style} />
   );
 };
+
 const Droppable = ({ id, children }) => {
   const { isOver, setNodeRef } = useDroppable({ id });
 
@@ -97,7 +98,7 @@ const triggerParticles = async () => {
   await tsParticles.load({
     id: 'tsparticles',
     options: {
-      fullScreen: { enable: true, zIndex: 999 },
+      fullScreen: { enable: true },
       particles: {
         number: { value: 100 },
         color: { value: ['#ff5733', '#0d6efd', '#b6118d', '#a7c3ee'] },
@@ -125,21 +126,23 @@ const MoodGame = () => {
   //timer will need to use 0-4 for inhale, 5-13 for hold, 14-22 exhale, and 23 for pop.
 
   const changeBubbleColor = () => {};
+
   const timeReference = useRef(0);
 
-  const timeBubble = () => {
+  const timeBubble = (startTime) => {
     setInterval(() => {
+      timeReference.current = startTime;
       timeReference.current += 1;
       setTimer(timeReference.current);
     }, 1000);
   };
 
   useEffect(() => {
-    if (timer >= 0 && timer <= 4) {
+    if (timer >= 0 && timer <= 3) {
       setBubbleColor('#0d6efd');
-    } else if (timer >= 5 && timer <= 13) {
+    } else if (timer >= 4 && timer <= 12) {
       setBubbleColor('#a7c3ee');
-    } else if (timer >= 14 && timer <= 22) {
+    } else if (timer >= 13 && timer <= 22) {
       setBubbleColor('#0d1725');
     } else if (timer >= 23) {
       setBubbleColor('#b6118d');
@@ -158,14 +161,11 @@ const MoodGame = () => {
         modifiers={[restrictToVerticalAxis]}
         onDragEnd={({ over, delta }) => {
           if (over?.id === 'pop') {
-            setGameStarted(false);
             triggerParticles();
-            timeReference.current = 0;
             setTimer(0);
             setPosition({ x: 0, y: 0 });
             setTimeout(() => {
-              setGameStarted(true);
-              timeBubble();
+              timeBubble(0);
             }, 3000);
           } else if (over) {
             setPosition((prev) => ({
