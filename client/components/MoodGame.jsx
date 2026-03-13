@@ -1,10 +1,94 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
 import {
   restrictToVerticalAxis,
   restrictToParentElement,
 } from '@dnd-kit/modifiers';
 import { tsParticles } from '@tsparticles/engine';
+
+const instructions = {
+  text: `Start the game and a bubble will appear.
+      The game begins when you hold down the bubble.
+      Drag the bubble to the box while you inhale for a full 4 seconds.
+      Tap the bubble to hold your breath and hold for another 7 seconds.
+      As you exhale, drag the bubble to the box and let go on 8 seconds.
+      The bubble will pop and your score will go up for each successful cycle.
+      When you complete 5 cycles, you are calm. Have sparkles.`,
+};
+
+const GameBox = ({ position, gameStarted, bubbleColor }) => {
+  return (
+    <div className="drop-container">
+      <div className="drop" style={{ position: 'relative' }}>
+        <div className="drop-inhale" style={{ position: 'relative' }}>
+          {gameStarted && (
+            <Draggable position={position} bubbleColor={bubbleColor} />
+          )}
+          <Droppable id="inhale">Inhale</Droppable>
+        </div>
+        <div className="drop-hold" style={{ position: 'relative' }}>
+          <Droppable id="hold">Hold</Droppable>
+        </div>
+        <div className="drop-exhale" style={{ position: 'relative' }}>
+          <Droppable id="exhale">Exhale</Droppable>
+        </div>
+        <div className="drop-pop " style={{ position: 'relative' }}>
+          <Droppable id="pop">Pop</Droppable>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Typewriter = ({ text, delay, infinite }) => {
+  const [currentText, setCurrentText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    let timeout;
+    if (currentIndex <= text.length) {
+      timeout = setTimeout(() => {
+        setCurrentText((prevText) => prevText + text[currentIndex]);
+        setCurrentIndex((prevIndex) => prevIndex + 1);
+      }, delay);
+    } else if (infinite) {
+      setCurrentIndex(0);
+      setCurrentText('');
+    }
+    return () => clearTimeout(timeout);
+  }, [currentIndex, delay, infinite, text]);
+  return <span>{currentText}</span>;
+};
+
+const Draggable = ({ position, bubbleColor }) => {
+  const { setNodeRef, listeners, attributes, transform } = useDraggable({
+    id: 'draggable',
+  });
+  const style = {
+    className: 'bubble',
+    width: '10vh',
+    height: '10vh',
+    borderRadius: '50%',
+    position: 'absolute',
+    top: position.y,
+    left: 'calc(50% - 5vh)',
+    zIndex: 10,
+    transform: transform ? `translate3d(0px, ${transform.y}px, 0)` : undefined,
+    backgroundColor: bubbleColor,
+  };
+  return (
+    <button ref={setNodeRef} {...listeners} {...attributes} style={style} />
+  );
+};
+const Droppable = ({ id, children }) => {
+  const { isOver, setNodeRef } = useDroppable({ id });
+
+  return (
+    <div ref={setNodeRef} className={isOver ? 'droppable-active' : 'droppable'}>
+      {children}
+    </div>
+  );
+};
 
 const MoodGame = () => {
   const [initalBubbleClick, setInitialBubbleClick] = useState(false);
@@ -13,85 +97,32 @@ const MoodGame = () => {
   const [eightSecondBubbleChange, setEightSecondBubbleChange] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [gameStarted, setGameStarted] = useState(false);
+  const [bubbleColor, setBubbleColor] = useState('#ff5733');
+  const [timer, setTimer] = useState(0);
+  //timer will need to use 0-4 for inhale, 5-13 for hold, 14-22 exhale, and 23 for pop.
 
-  const instructions = {
-    text: `Start the game and a bubble will appear.
-      The game begins when you hold down the bubble.
-      Drag the bubble to the box while you inhale for a full 4 seconds.
-      Tap the bubble to hold your breath and hold for another 7 seconds.
-      As you exhale, drag the bubble to the box and let go on 8 seconds.
-      The bubble will pop and your score will go up for each successful cycle.
-      When you complete 5 cycles, you are calm. Have sparkles.`,
+  const changeBubbleColor = () => {};
+  const timeReference = useRef(0);
+
+  const timeBubble = () => {
+    setInterval(() => {
+      timeReference.current += 1;
+      setTimer(timeReference.current);
+    }, 1000);
   };
 
-  const Typewriter = ({ text, delay, infinite }) => {
-    const [currentText, setCurrentText] = useState('');
-    const [currentIndex, setCurrentIndex] = useState(0);
+  useEffect(() => {
+    if (timer >= 0 && timer <= 4) {
+      setBubbleColor('#0d6efd');
+    } else if (timer >= 5 && timer <= 13) {
+      setBubbleColor('#a7c3ee');
+    } else if (timer >= 14 && timer <= 22) {
+      setBubbleColor('#0d1725');
+    } else if (timer >= 23) {
+      setBubbleColor('#b6118d');
+    }
+  }, [timer]);
 
-    useEffect(() => {
-      let timeout;
-      if (currentIndex <= text.length) {
-        timeout = setTimeout(() => {
-          setCurrentText((prevText) => prevText + text[currentIndex]);
-          setCurrentIndex((prevIndex) => prevIndex + 1);
-        }, delay);
-      } else if (infinite) {
-        setCurrentIndex(0);
-        setCurrentText('');
-      }
-      return () => clearTimeout(timeout);
-    }, [currentIndex, delay, infinite, text]);
-    return <span>{currentText}</span>;
-  };
-
-  const Draggable = ({ position }) => {
-    const { setNodeRef, listeners, attributes, transform } = useDraggable({
-      id: 'draggable',
-    });
-
-    const style = {
-      width: '10vh',
-      height: '10vh',
-      borderRadius: '50%',
-      position: 'absolute',
-      top: position.y,
-      left: 'calc(50% - 5vh)',
-      zIndex: 10,
-      transform: transform
-        ? `translate3d(0px, ${transform.y}px, 0)`
-        : undefined,
-    };
-    return (
-      <button ref={setNodeRef} {...listeners} {...attributes} style={style} />
-    );
-  };
-
-  const Droppable = ({ id, children }) => {
-    const { isOver, setNodeRef } = useDroppable({ id });
-
-    return (
-      <div
-        ref={setNodeRef}
-        className={isOver ? 'droppable-active' : 'droppable'}
-      >
-        {children}
-      </div>
-    );
-  };
-
-  const GameBox = ({ position, gameStarted }) => {
-    return (
-      <div className="drop-container">
-        <div className="drop" style={{ position: 'relative' }}>
-          {gameStarted && <Draggable position={position} />}
-          <Droppable id="inhale">Inhale</Droppable>
-          <Droppable id="hold">Hold</Droppable>
-          <Droppable id="exhale">Exhale</Droppable>
-          <Droppable id="pop">Pop</Droppable>
-        </div>
-      </div>
-    );
-  };
   return (
     <div
       className="wof-component container"
@@ -111,19 +142,21 @@ const MoodGame = () => {
           }
         }}
       >
-        <GameBox position={position} gameStarted={gameStarted} />
+        <GameBox
+          position={position}
+          gameStarted={gameStarted}
+          bubbleColor={bubbleColor}
+        />
       </DndContext>
-      <Typewriter
-        text={`Start the game and a bubble will appear.
-      The game begins when you hold down the bubble.
-      Drag the bubble to the box while you inhale for a full 4 seconds.
-      Tap the bubble to hold your breath and hold for another 7 seconds.
-      As you exhale, drag the bubble to the box and let go on 8 seconds.
-      The bubble will pop and your score will go up for each successful cycle.
-      When you complete 5 cycles, you are calm. Have sparkles.`}
-        delay={100}
-      />
-      <button onClick={() => setGameStarted(true)}>Start the Game</button>
+      <Typewriter text={instructions.text} delay={100} />
+      <button
+        onClick={() => {
+          setGameStarted(true);
+          timeBubble();
+        }}
+      >
+        Start the Game
+      </button>
       <div id="tsparticles"></div>
     </div>
   );
