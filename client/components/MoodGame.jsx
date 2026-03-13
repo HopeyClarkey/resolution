@@ -128,13 +128,17 @@ const MoodGame = () => {
   const changeBubbleColor = () => {};
 
   const timeReference = useRef(0);
-
-  const timeBubble = (startTime) => {
+  const intervalRef = useRef(null);
+  const timeBubble = () => {
     setInterval(() => {
-      timeReference.current = startTime;
-      timeReference.current += 1;
-      setTimer(timeReference.current);
-    }, 1000);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      intervalRef.current = setInterval(() => {
+        timeReference.current += 1;
+        setTimer(timeReference.current);
+      }, 1000);
+    });
   };
 
   useEffect(() => {
@@ -163,9 +167,10 @@ const MoodGame = () => {
           if (over?.id === 'pop') {
             triggerParticles();
             setTimer(0);
+            setBubbleColor('#0d6efd');
             setPosition({ x: 0, y: 0 });
             setTimeout(() => {
-              timeBubble(0);
+              timeBubble();
             }, 3000);
           } else if (over) {
             setPosition((prev) => ({
