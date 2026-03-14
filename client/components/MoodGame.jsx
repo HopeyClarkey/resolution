@@ -1,7 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import {
+  DndContext,
+  useDraggable,
+  useDroppable,
+  MouseSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  rectIntersection,
+} from '@dnd-kit/core';
+
 import { tsParticles } from '@tsparticles/engine';
 import { loadFull } from 'tsparticles';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Instructions
 const instructions = {
@@ -45,8 +56,8 @@ const triggerParticles = async () => {
 const Boxes = {
   inhale: { name: 'inhale', duration: 4, next: 'hold', color: '#0d6efd' },
   hold: { name: 'hold', duration: 7, next: 'exhale', color: '#a7c3ee' },
-  exhale: { name: 'exhale', duration: 8, next: 'pop', color: '#0d6efd' },
-  pop: { name: 'pop', duration: null, next: null, color: '#0d6efd' },
+  exhale: { name: 'exhale', duration: 8, next: 'pop', color: '#0d1725' },
+  pop: { name: 'pop', duration: null, next: null, color: '#b6118d' },
 };
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Instruction Typing
@@ -101,7 +112,6 @@ const Bubble = ({ bubbleColor }) => {
     />
   );
 };
-
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~DropBox
 
 const DropBox = ({ id, label, isActive }) => {
@@ -127,22 +137,19 @@ const DropBox = ({ id, label, isActive }) => {
   );
 };
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GameBox
-const GameBox = ({ gameStarted, bubbleColor, cycleKey }) => (
-  <div style={{ position: 'relative', maxWidth: '100%', margin: '0 auto' }}>
-    <DropBox
-      id="inhale"
-      label="inhale4s"
-      isActive={currentPhase === 'inhale'}
-    />
-    <DropBox id="hold" label="hold7s" isActive={currentPhase === 'hold'} />
-
-    <DropBox
-      id="exhale"
-      label="exhale8s"
-      isActive={currentPhase === 'exhale'}
-    />
-    <DropBox id="pop" label="pop" isActive={currentPhase === 'pop'} />
-    {gameStarted && <Bubble bubbleColor={bubbleColor} key={cycleKey} />}
+const GameBox = ({ gameStarted, bubbleColor, cycleKey, currentBox }) => (
+  <div style={{ maxWidth: '300px', margin: '0 auto' }}>
+    {gameStarted && (
+      <div
+        style={{ position: 'relative', height: '10vh', marginBottom: '1rem' }}
+      >
+        <Bubble bubbleColor={bubbleColor} key={cycleKey} />
+      </div>
+    )}
+    <DropBox id="inhale" label="Inhale 4s" isActive={currentBox === 'inhale'} />
+    <DropBox id="hold" label="Hold 7s" isActive={currentBox === 'hold'} />
+    <DropBox id="exhale" label="Exhale 8s" isActive={currentBox === 'exhale'} />
+    <DropBox id="pop" label="Pop!" isActive={currentBox === 'pop'} />
   </div>
 );
 // return (
@@ -170,7 +177,7 @@ const GameBox = ({ gameStarted, bubbleColor, cycleKey }) => (
 //     </div>
 //   </div>
 // );
-
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~GamePage
 const MoodGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [box, setBox] = useState('inhale');
@@ -234,7 +241,7 @@ const MoodGame = () => {
     if (nextCycles >= 5) {
       setTimeout(() => {
         setGameStarted(false);
-        setCycles(nextCycles);
+        setCycles(0);
         setBox('inhale');
         setBoxTimer(0);
       }, 3000);
@@ -253,6 +260,56 @@ const MoodGame = () => {
     setBoxTimer(0);
     setActiveZone(null);
   };
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 50, tolerance: 5 },
+    }),
+  );
+  return (
+    <div
+      className="wof-component container"
+      style={{ alignContent: 'center', padding: 25 }}
+    >
+      <h1 className="text-primary">
+        Angry? Calm down with 4-7-8 breathing bubbles!!
+      </h1>
+      {gameStarted && (
+        <p style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
+          Box: <strong>{box}</strong>
+          {Boxes[box]?.duration && ` · ${boxTimer} / ${Boxes[box].duration}s`} ·
+          Cycle {cycles + 1} of 5
+        </p>
+      )}
+      <DndContext
+        sensors={sensors}
+        modifiers={[restrictToVerticalAxis]}
+        collisionDetection={rectIntersection}
+        onDragStart={() => setActiveZone(null)}
+        onDragOver={({ over }) => setActiveZone(over?.id ?? null)}
+        onDragEnd={({ over }) => {
+          setActiveZone(over?.id ?? null);
+          if (over?.id === 'pop') {
+            handlePop();
+          }
+        }}
+      >
+        <GameBox
+          gameStarted={gameStarted}
+          bubbleColor={bubbleColor}
+          cycleKey={cycleKey}
+          currentBox={box}
+        />
+      </DndContext>
+      <Typewriter text={instructions.text} delay={50} />
+      {!gameStarted && (
+        <button onClick={handleStartGame} style={{ marginTop: '1rem' }}>
+          Start the Game
+        </button>
+      )}
+      <div id="tsparticles" />
+    </div>
+  );
 };
 export default MoodGame;
 
