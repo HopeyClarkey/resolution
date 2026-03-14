@@ -72,7 +72,7 @@ const Typewriter = ({ text, delay, infinite }) => {
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Bubble
 
-const Draggable = ({ bubbleColor }) => {
+const Bubble = ({ bubbleColor }) => {
   const { setNodeRef, listeners, attributes, transform } = useDraggable({
     id: 'draggable',
   });
@@ -134,21 +134,14 @@ const GameBox = ({ gameStarted, bubbleColor, cycleKey }) => (
       label="inhale4s"
       isActive={currentPhase === 'inhale'}
     />
-    <DropBox 
-      id="hold" 
-      label="hold7s" 
-      isActive={currentPhase === 'hold'} 
-    />
+    <DropBox id="hold" label="hold7s" isActive={currentPhase === 'hold'} />
 
     <DropBox
       id="exhale"
       label="exhale8s"
       isActive={currentPhase === 'exhale'}
     />
-    <DropBox 
-      id="pop" 
-      label="pop"
-      isActive={currentPhase === 'pop'} />
+    <DropBox id="pop" label="pop" isActive={currentPhase === 'pop'} />
     {gameStarted && <Bubble bubbleColor={bubbleColor} key={cycleKey} />}
   </div>
 );
@@ -179,92 +172,165 @@ const GameBox = ({ gameStarted, bubbleColor, cycleKey }) => (
 // );
 
 const MoodGame = () => {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
   const [gameStarted, setGameStarted] = useState(false);
-  const [bubbleColor, setBubbleColor] = useState('#ff5733');
-  const [timer, setTimer] = useState(0);
+  const [box, setBox] = useState('inhale');
+  const [boxTimer, setBoxTimer] = useState(0);
+  const [activeZone, setActiveZone] = useState(null);
   const [cycleKey, setCycleKey] = useState(0);
+  const [cycles, setCycles] = useState(0);
+  const intervalRef = useRef(null);
   //timer will need to use 0-4 for inhale, 5-13 for hold, 14-22 exhale, and 23 for pop.
 
-  const changeBubbleColor = () => {};
+  const bubbleColor = Boxes[box]?.color ?? `#0d6efd`;
 
-  // const timeReference = useRef(0);
-  // const intervalRef = useRef(null);
-  // const timeBubble = () => {
-  //   if (intervalRef.current) {
-  //     clearInterval(intervalRef.current);
-  //   }
-  //   timeReference.current = 0;
-  //   intervalRef.current = setInterval(() => {
-  //     timeReference.current += 1;
-  //     setTimer(timeReference.current);
-  //   }, 1000);
-  // };
+  const stopInterval = () => {
+    clearInterval(intervalRef.current);
+    intervalRef.current = null;
+  };
+
+  const startInterval = () => {
+    stopInterval();
+    intervalRef.current = setInterval(() => {
+      setBoxTimer((t) => t + 1);
+    }, 1000);
+  };
 
   useEffect(() => {
-    if (timer === null) {
+    const config = Boxes[box];
+    if (!config?.duration) {
       return;
     }
-    console.log('timer:', timer);
-    if (timer <= 3) {
-      setBubbleColor('#0d6efd');
-    } else if (timer <= 12) {
-      setBubbleColor('#a7c3ee');
-    } else if (timer <= 22) {
-      setBubbleColor('#0d1725');
-    } else if (timer >= 23) {
-      setBubbleColor('#b6118d');
+    if (activeZone === config.name) {
+      startInterval();
+    } else {
+      stopInterval();
+      setBoxTimer(0);
     }
-    const time = setTimeout(() => {
-      setTimer((t) => t + 1);
-    }, 1000);
+    return stopInterval;
+  }, [box, activeZone]);
 
-    return () => clearTimeout(time);
-  }, [timer]);
+  useEffect(() => {
+    const config = Boxes[box];
+    if (!config?.duration) {
+      return;
+    }
+    if (boxTimer >= config.duration) {
+      stopInterval();
+      setBoxTimer(0);
+      setBox(config.next);
+    }
+  }, [boxTimer, box]);
 
-  const startTimer = () => setTimer(0);
-  const resetTimer = () => setTimer(null);
+  const handlePop = () => {
+    if (box !== 'pop') {
+      return;
+    }
+    stopInterval();
+    triggerParticles();
+    setCycleKey((k) => k + 1);
+    setActiveZone(null);
 
-  return (
-    <div
-      className="wof-component container"
-      style={{ alignContent: 'center', padding: 25 }}
-    >
-      <h1 className="text-primary">
-        Angry? Calm down with 4-7-8 breathing bubbles!!
-      </h1>
-      <DndContext
-        //modifiers={[restrictToVerticalAxis]}
-        onDragEnd={({ over, delta }) => {
-          console.log('drag ended, over:', over?.id, 'delta:', delta);
-          if (over?.id === 'pop') {
-            triggerParticles();
-            setPosition({ x: 0, y: 0 });
-            setCycleKey((k) => k + 1); // ← add this
-            setTimeout(() => {
-              setTimer(0);
-            }, 3000);
-          }
-        }}
-      >
-        <GameBox
-          position={position}
-          gameStarted={gameStarted}
-          bubbleColor={bubbleColor}
-          cycleKey={cycleKey}
-        />
-      </DndContext>
-      <Typewriter text={instructions.text} delay={100} />
-      <button
-        onClick={() => {
-          setGameStarted(true);
-          startTimer();
-        }}
-      >
-        Start the Game
-      </button>
-      <div id="tsparticles"></div>
-    </div>
-  );
+    const nextCycles = cycles + 1;
+    if (nextCycles >= 5) {
+      setTimeout(() => {
+        setGameStarted(false);
+        setCycles(nextCycles);
+        setBox('inhale');
+        setBoxTimer(0);
+      }, 3000);
+    } else {
+      setCycles(0);
+      setTimeout(() => {
+        setBox('inhale');
+        setBoxTimer(0);
+      }, 3000);
+    }
+  };
+
+  const handleStartGame = () => {
+    setGameStarted(true);
+    setBox('inhale');
+    setBoxTimer(0);
+    setActiveZone(null);
+  };
 };
 export default MoodGame;
+
+// const timeReference = useRef(0);
+// const intervalRef = useRef(null);
+// const timeBubble = () => {
+//   if (intervalRef.current) {
+//     clearInterval(intervalRef.current);
+//   }
+//   timeReference.current = 0;
+//   intervalRef.current = setInterval(() => {
+//     timeReference.current += 1;
+//     setTimer(timeReference.current);
+//   }, 1000);
+// };
+
+// useEffect(() => {
+//   if (timer === null) {
+//     return;
+//   }
+//   console.log('timer:', timer);
+//   if (timer <= 3) {
+//     setBubbleColor('#0d6efd');
+//   } else if (timer <= 12) {
+//     setBubbleColor('#a7c3ee');
+//   } else if (timer <= 22) {
+//     setBubbleColor('#0d1725');
+//   } else if (timer >= 23) {
+//     setBubbleColor('#b6118d');
+//   }
+//   const time = setTimeout(() => {
+//     setTimer((t) => t + 1);
+//   }, 1000);
+
+//   return () => clearTimeout(time);
+// }, [timer]);
+
+// const startTimer = () => setTimer(0);
+// const resetTimer = () => setTimer(null);
+
+// return (
+//   <div
+//     className="wof-component container"
+//     style={{ alignContent: 'center', padding: 25 }}
+//   >
+//     <h1 className="text-primary">
+//       Angry? Calm down with 4-7-8 breathing bubbles!!
+//     </h1>
+//     <DndContext
+//       //modifiers={[restrictToVerticalAxis]}
+//       onDragEnd={({ over, delta }) => {
+//         console.log('drag ended, over:', over?.id, 'delta:', delta);
+//         if (over?.id === 'pop') {
+//           triggerParticles();
+//           setPosition({ x: 0, y: 0 });
+//           setCycleKey((k) => k + 1); // ← add this
+//           setTimeout(() => {
+//             setTimer(0);
+//           }, 3000);
+//         }
+//       }}
+//     >
+//       <GameBox
+//         position={position}
+//         gameStarted={gameStarted}
+//         bubbleColor={bubbleColor}
+//         cycleKey={cycleKey}
+//       />
+//     </DndContext>
+//     <Typewriter text={instructions.text} delay={100} />
+//     <button
+//       onClick={() => {
+//         setGameStarted(true);
+//         startTimer();
+//       }}
+//     >
+//       Start the Game
+//     </button>
+//     <div id="tsparticles"></div>
+//   </div>
+// );
