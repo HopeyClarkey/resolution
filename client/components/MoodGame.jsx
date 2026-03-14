@@ -1,13 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
-import {
-  restrictToVerticalAxis,
-  restrictToParentElement,
-} from '@dnd-kit/modifiers';
-
 import { tsParticles } from '@tsparticles/engine';
 import { loadFull } from 'tsparticles';
 
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Instructions
 const instructions = {
   text: `Start the game and a bubble will appear.
       The game begins when you hold down the bubble.
@@ -17,6 +13,43 @@ const instructions = {
       The bubble will pop and your score will go up for each successful cycle.
       When you complete 5 cycles, you are calm. Have sparkles.`,
 };
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Particles
+const triggerParticles = async () => {
+  await loadFull(tsParticles);
+  await tsParticles.load({
+    id: 'tsparticles',
+    options: {
+      fullScreen: { enable: true },
+      particles: {
+        number: { value: 100 },
+        color: { value: ['#ff5733', '#0d6efd', '#b6118d', '#a7c3ee'] },
+        shape: { type: 'circle' },
+        opacity: { value: 0.8 },
+        size: { value: { min: 5, max: 15 } },
+        move: {
+          enable: true,
+          speed: 6,
+          direction: 'none',
+          outModes: 'out',
+        },
+        life: { duration: { value: 2 }, count: 1 },
+      },
+      emitters: { life: { count: 1, duration: 0.3 } },
+    },
+  });
+};
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~Boxes
+
+const Boxes = {
+  inhale: {name: 'inhale', duration: 4, next: 'hold', color: '#0d6efd'},
+  hold: {name: 'hold', duration: 7, next: 'exhale', color: '#a7c3ee'},
+  exhale: {name: 'exhale', duration: 8, next: 'pop', color: '#0d6efd'},
+  pop: {name: 'pop', duration: null, next: null, color: '#0d6efd'},
+};
+
+
 
 const GameBox = ({ position, gameStarted, bubbleColor }) => {
   const [cycleKey, setCycleKey] = useState(0);
@@ -98,30 +131,6 @@ const Droppable = ({ id, children }) => {
   );
 };
 
-const triggerParticles = async () => {
-  await loadFull(tsParticles);
-  await tsParticles.load({
-    id: 'tsparticles',
-    options: {
-      fullScreen: { enable: true },
-      particles: {
-        number: { value: 100 },
-        color: { value: ['#ff5733', '#0d6efd', '#b6118d', '#a7c3ee'] },
-        shape: { type: 'circle' },
-        opacity: { value: 0.8 },
-        size: { value: { min: 5, max: 15 } },
-        move: {
-          enable: true,
-          speed: 6,
-          direction: 'none',
-          outModes: 'out',
-        },
-        life: { duration: { value: 2 }, count: 1 },
-      },
-      emitters: { life: { count: 1, duration: 0.3 } },
-    },
-  });
-};
 
 const MoodGame = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
